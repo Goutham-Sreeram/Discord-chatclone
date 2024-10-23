@@ -22,127 +22,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app); // Initialize Firebase Authentication
-const db = getFirestore(app); // Initialize Firestore
-
-// Lucide icons initialization
-lucide.createIcons();
-
-// GSAP Animations
-const tl = gsap.timeline();
-tl.from("h1", {
-  y: -50,
-  opacity: 0,
-  duration: 0.5,
-  ease: "power2.out",
-});
-
-// Function to add a new message
-function addMessage(text) {
-  const messageDiv = `
-  <div class="message">
-    <p class="message-content">${data.message}</p>
-    <p class="name">${data.name}</p>
-    <p class="time">${time}</p>
-  </div>
-`;
-
-  document.getElementById("msgs").appendChild(messageDiv);
-  lucide.createIcons(); // Reinitialize icons
-
-  // Animate new message
-  gsap.from(messageDiv, {
-    x: -20,
-    opacity: 0,
-    duration: 0.5,
-    ease: "power2.out",
-  });
-
-  // Scroll to bottom
-  messageDiv.scrollIntoView({ behavior: "smooth" });
-}
-
-// Handle form submission
-document.querySelector("form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const input = document.getElementById("message-input");
-  if (input.value.trim()) {
-    // Show typing indicator
-    const typingIndicator = document.querySelector(".typing-indicator");
-    gsap.to(typingIndicator, {
-      opacity: 1,
-      duration: 0.3,
-    });
-
-    // Animate typing dots
-    gsap.to(".typing-dot", {
-      y: -4,
-      stagger: 0.2,
-      repeat: 2,
-      yoyo: true,
-      duration: 0.3,
-      onComplete: () => {
-        // Hide typing indicator and send message
-        gsap.to(typingIndicator, {
-          opacity: 0,
-          duration: 0.3,
-          onComplete: () => {
-            addMessage(input.value);
-            input.value = ""; // Clear input after sending
-          },
-        });
-      },
-    });
-  }
-});
-
-// Animate buttons on hover
-document.querySelectorAll(".action-button").forEach((button) => {
-  button.addEventListener("mouseenter", () => {
-    gsap.to(button.querySelector("[data-lucide]"), {
-      scale: 1.2,
-      duration: 0.3,
-    });
-  });
-
-  button.addEventListener("mouseleave", () => {
-    gsap.to(button.querySelector("[data-lucide]"), {
-      scale: 1,
-      duration: 0.3,
-    });
-  });
-});
-
-// Send message to Firestore
-document.getElementById("send-btn").onclick = async function (e) {
-  e.preventDefault();
-  const input = document.getElementById("message-input");
-  if (input.value === "") {
-    alert("Type anything");
-    return;
-  }
-
-  const userName = localStorage.getItem("name");
-  if (!userName) {
-    alert("User not authenticated!");
-    return;
-  }
-
-  try {
-    // Add new message to Firestore
-    await addDoc(collection(db, "message"), {
-      message: input.value,
-      time: new Date(),
-      name: userName,
-    });
-    input.value = ""; // Clear input field
-  } catch (error) {
-    console.error("Error adding document: ", error);
-  }
-
-  // Fetch messages after adding
-  messageGet();
-};
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 // Fetch and display messages
 const messageGet = async function () {
@@ -173,6 +54,9 @@ const messageGet = async function () {
       const data = doc.data();
       const messageDate = new Date(data.time.toMillis());
 
+      const isUser = data.name === userName; // Check if the message is from the user
+      const messageClass = isUser ? "sender" : "receiver"; // Determine class
+
       // Add date separator if date changes
       if (
         !currentDate ||
@@ -194,7 +78,7 @@ const messageGet = async function () {
       const formattedHours = hours % 12 || 12; // Convert to 12-hour format
       const time = `${formattedHours}:${minutes} ${amPm}`;
       const messageDiv = `
-          <div class="message">
+          <div class="message ${messageClass}">
             <p class="name">${data.name}</p>
             <p class="message-content">${data.message}</p>
             <p class="time">${time}</p>
@@ -207,4 +91,54 @@ const messageGet = async function () {
   });
 };
 
-window.onload = messageGet; // Load messages when page loads
+// Function to add a new message
+function addMessage(text, isUser = true) {
+  const messageClass = isUser ? "sender" : "receiver";
+
+  const messageDiv = document.createElement("div");
+  messageDiv.classList.add("message", messageClass);
+
+  const messageContent = `
+    <p class="message-content">${text}</p>
+    <p class="name">${isUser ? "You" : "Other User"}</p>
+    <p class="time">${new Date().toLocaleTimeString()}</p>
+  `;
+
+  messageDiv.innerHTML = messageContent;
+  document.getElementById("msgs").appendChild(messageDiv);
+
+  // Animate new message
+  gsap.from(messageDiv, {
+    x: isUser ? 20 : -20,
+    opacity: 0,
+    duration: 0.5,
+    ease: "power2.out",
+  });
+
+  // Scroll to bottom
+  messageDiv.scrollIntoView({ behavior: "smooth" });
+}
+
+// Send message on form submission
+document.querySelector(".send-option").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const messageInput = document.getElementById("message-input");
+  const messageText = messageInput.value.trim();
+  if (messageText === "") return;
+
+  const userName = localStorage.getItem("name");
+
+  // Add message to Firestore
+  await addDoc(collection(db, "message"), {
+    name: userName,
+    message: messageText,
+    time: new Date(),
+  });
+
+  // Add to local display
+  addMessage(messageText, true);
+  messageInput.value = ""; // Clear input
+});
+
+// Initialize the message display
+messageGet();

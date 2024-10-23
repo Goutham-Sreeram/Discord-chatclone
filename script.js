@@ -17,6 +17,28 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+// GSAP animations for the landing page
+window.onload = function () {
+  // Animate the heading
+  gsap.from("h1", {
+    duration: 1,
+    opacity: 0,
+    y: -50,
+    ease: "bounce.out",
+  });
+
+  // Animate the button
+  gsap.from("#startButton", {
+    duration: 1,
+    opacity: 0,
+    y: 50,
+    delay: 0.5,
+    ease: "power3.out",
+  });
+};
+
+// Add any additional JS functionalities below
+
 document.getElementById("startButton").onclick = async function () {
   // Get the user's name from the input field
   // const name = document.getElementById("nameInput").value;
