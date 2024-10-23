@@ -1,0 +1,215 @@
+/* Global styles */
+:root {
+    --discord-dark: #36393f;
+    --discord-darker: #2f3136;
+    --discord-light: #dcddde;
+    --discord-blue: #5865f2;
+    --discord-gray: #72767d;
+    --discord-channel: #2e3338;
+    --discord-text-input: #40444b;
+}
+
+body {
+    background-color: var(--discord-dark);
+    color: var(--discord-light);
+    margin: 0;
+    font-family: 'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+section {
+    height: calc(100vh - 40px);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header styles */
+section h1 {
+    font-size: 1.3em;
+    position: relative;
+    background-color: var(--discord-dark);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+section h1 #userNameSpan {
+    color: var(--discord-blue);
+    font-weight: 500;
+}
+
+/* Message container styles */
+.message-container {
+    height: calc(100% - 68px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    overflow-y: scroll;
+    background-color: var(--discord-dark);
+}
+
+.message-container .date {
+    text-align: center;
+    background: var(--discord-darker);
+    color: var(--discord-gray);
+    font-size: 12px;
+    padding: 8px;
+    border-radius: 4px;
+    width: fit-content;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.message:hover {
+    background: var(--discord-channel);
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--discord-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.message {
+    margin-bottom: 1rem;
+  }
+  
+  .message-content {
+    font-size: 1rem; /* Adjust if needed */
+  }
+  
+  .name {
+    font-size: 0.8rem; /* Small size for the name */
+    color: #888888;     /* Grey color */
+    margin-top: 0.2rem;
+  }
+  
+  .time {
+    font-size: 0.7rem; /* Even smaller for the timestamp */
+    color: #aaaaaa;    /* Lighter grey for time */
+  }
+  
+
+
+/* Input area styles */
+.send-option {
+    margin: 0;
+    padding: 16px;
+    background-color: var(--discord-dark);
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--discord-text-input);
+    border-radius: 8px;
+    padding: 0 16px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+}
+
+.action-button {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.action-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.send-option input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 12px;
+    min-height: 44px;
+    color: var(--discord-light);
+    font-size: 1em;
+}
+
+.send-option input::placeholder {
+    color: var(--discord-gray);
+}
+
+/* Lucide icon styles */
+[data-lucide] {
+    width: 20px;
+    height: 20px;
+    color: var(--discord-gray);
+}
+
+.send-button [data-lucide] {
+    color: var(--discord-blue);
+}
+
+/* Animation styles */
+.bounce-animation {
+    animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Typing indicator styles */
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 8px;
+    opacity: 0;
+}
+
+.typing-dot {
+    width: 4px;
+    height: 4px;
+    background: var(--discord-gray);
+    border-radius: 50%;
+}
+
+/* Scrollbar styles */
+.message-container::-webkit-scrollbar {
+    width: 8px;
+    background: transparent;
+}
+
+.message-container::-webkit-scrollbar-thumb {
+    background-color: var(--discord-darker);
+    border-radius: 4px;
+}
+
+.message-container::-webkit-scrollbar-track {
+    background: transparent;
+}

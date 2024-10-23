@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="./assets/images/favicon.png"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="./styles/chat.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="module" src="./index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <title>Chatapp | Chat</title>
+  </head>
+
+  <body>
+    <section>
+      <h1>
+        <i data-lucide="hash"></i>
+        <span id="greeting">Welcome, </span>
+        <span id="userNameSpan">User</span>
+      </h1>
+
+      <div class="message-container" id="msgs">
+        <div class="date">
+          <i data-lucide="calendar"></i>
+          21 February 2023
+        </div>
+      </div>
+
+      <form class="send-option">
+        <div class="input-wrapper">
+          <button type="button" class="action-button" id="upload-btn">
+            <i data-lucide="plus-circle"></i>
+          </button>
+          <input
+            type="text"
+            id="message-input"
+            placeholder="Message #general"
+          />
+          <div class="action-buttons">
+            <button type="button" class="action-button" id="emoji-btn">
+              <i data-lucide="smile"></i>
+            </button>
+            <button type="button" class="action-button" id="gif-btn">
+              <i data-lucide="sticker"></i>
+            </button>
+            <button
+              type="submit"
+              class="action-button send-button"
+              id="send-btn"
+            >
+              <i data-lucide="send"></i>
+            </button>
+          </div>
+        </div>
+        <div class="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </form>
+    </section>
+  </body>
+</html>
