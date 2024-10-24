@@ -3,19 +3,251 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="shortcut icon"
-      href="./assets/images/favicon.png"
-      type="image/x-icon"
-    />
-    <link rel="stylesheet" href="./styles/chat.css" />
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script type="module" src="./index.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <title>Chatapp | Chat</title>
-  </head>
+    <title>Enhanced Discord Chat</title>
+    <style>
+      :root {
+        --discord-dark: #36393f;
+        --discord-darker: #2f3136;
+        --discord-darkest: #202225;
+        --discord-light: #dcddde;
+        --discord-blue: #5865f2;
+        --discord-purple: #7289da;
+        --discord-gray: #72767d;
+        --discord-text-input: #40444b;
+        --discord-hover: #32353b;
+      }
 
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--discord-darkest);
+        color: var(--discord-light);
+        font-family: "gg sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        height: 100vh;
+        display: flex;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 240px;
+        background-color: var(--discord-darker);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .server-header {
+        padding: 16px;
+        font-weight: bold;
+        color: var(--discord-light);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+      }
+
+      .channel-item {
+        padding: 8px 16px;
+        color: var(--discord-gray);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .channel-item:hover {
+        background-color: var(--discord-hover);
+        color: var(--discord-light);
+      }
+
+      /* Main section */
+      section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        background-color: var(--discord-dark);
+      }
+
+      section h1 {
+        padding: 16px;
+        background-color: var(--discord-dark);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.2rem;
+        margin: 0;
+      }
+
+      #userNameSpan {
+        color: var(--discord-purple);
+        font-weight: 500;
+      }
+
+      /* Messages area */
+      #msgs {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .date {
+        text-align: center;
+        background: var(--discord-darker);
+        color: var(--discord-gray);
+        font-size: 12px;
+        padding: 8px 16px;
+        border-radius: 4px;
+        width: fit-content;
+        margin: 20px auto;
+      }
+
+      .message {
+        padding: 8px 16px;
+        margin-bottom: 4px;
+        max-width: 80%;
+        border-radius: 8px;
+        position: relative;
+      }
+
+      .message.sender {
+        background-color: var(--discord-blue);
+        align-self: flex-end;
+        color: white;
+      }
+
+      .message.receiver {
+        background-color: var(--discord-darker);
+        align-self: flex-start;
+      }
+
+      .message-content {
+        font-size: 0.95rem;
+        margin-bottom: 16px;
+        word-wrap: break-word;
+      }
+
+      .name {
+        font-size: 0.75rem;
+        color: var(--discord-gray);
+        margin-bottom: 2px;
+      }
+
+      .message.sender .name {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .time {
+        font-size: 0.7rem;
+        color: var(--discord-gray);
+        position: absolute;
+        bottom: 4px;
+        right: 8px;
+      }
+
+      .message.sender .time {
+        color: rgba(184, 184, 184, 0.7);
+      }
+
+      /* Input area */
+      .send-option {
+        padding: 16px;
+        background-color: var(--discord-dark);
+        border-top: 1px solid rgba(0, 0, 0, 0.2);
+      }
+
+      .input-wrapper {
+        background-color: var(--discord-text-input);
+        border-radius: 8px;
+        padding: 0 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      #message-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--discord-light);
+        font-size: 1rem;
+        padding: 12px 0;
+        min-height: 44px;
+        outline: none;
+      }
+
+      #message-input::placeholder {
+        color: var(--discord-gray);
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+        padding: 8px;
+      }
+
+      .action-button {
+        background: transparent;
+        border: none;
+        padding: 8px;
+        color: var(--discord-gray);
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s;
+      }
+
+      .action-button:hover {
+        background-color: var(--discord-hover);
+        color: var(--discord-light);
+      }
+
+      #send-btn [data-lucide="send"] {
+        color: var(--discord-blue);
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--discord-darker);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--discord-gray);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .sidebar {
+          display: none;
+        }
+      }
+    </style>
+  </head>
   <body>
+    <div class="sidebar">
+      <div class="server-header">Discord Server</div>
+      <div class="channel-item">
+        <i data-lucide="hash"></i>
+        general
+      </div>
+      <div class="channel-item">
+        <i data-lucide="hash"></i>
+        announcements
+      </div>
+    </div>
+
     <section>
       <h1>
         <i data-lucide="hash"></i>
@@ -23,7 +255,7 @@
         <span id="userNameSpan">User</span>
       </h1>
 
-      <div class="message-container" id="msgs"></div>
+      <div id="msgs"></div>
 
       <form class="send-option">
         <div class="input-wrapper">
@@ -42,21 +274,19 @@
             <button type="button" class="action-button" id="gif-btn">
               <i data-lucide="sticker"></i>
             </button>
-            <button
-              type="submit"
-              class="action-button send-button"
-              id="send-btn"
-            >
+            <button type="submit" class="action-button" id="send-btn">
               <i data-lucide="send"></i>
             </button>
           </div>
         </div>
-        <div class="typing-indicator">
-          <div class="typing-dot"></div>
-          <div class="typing-dot"></div>
-          <div class="typing-dot"></div>
-        </div>
       </form>
     </section>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script type="module" src="./index.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
   </body>
 </html>
