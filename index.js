@@ -136,8 +136,6 @@ document.querySelector(".send-option").addEventListener("submit", async (e) => {
     time: new Date(),
   });
 
-  // Add to local display
-  addMessage(messageText, true);
   messageInput.value = ""; // Clear input
 });
 
