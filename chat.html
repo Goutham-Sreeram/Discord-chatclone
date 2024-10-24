@@ -189,6 +189,61 @@
         gap: 8px;
         padding: 8px;
       }
+      /* Add these styles to your existing CSS */
+
+      .channels-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        color: var(--discord-gray);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+
+      .channels-list {
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .channel-item {
+        padding: 8px 16px;
+        color: var(--discord-gray);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .channel-item:hover {
+        background-color: var(--discord-hover);
+        color: var(--discord-light);
+      }
+
+      .channel-item.active {
+        background-color: var(--discord-hover);
+        color: var(--discord-light);
+      }
+
+      #add-channel-btn {
+        padding: 4px;
+        background: transparent;
+        border: none;
+        color: var(--discord-gray);
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      #add-channel-btn:hover {
+        color: var(--discord-light);
+      }
+
+      .channel-name {
+        color: var(--discord-light);
+        font-weight: 500;
+      }
 
       .action-button {
         background: transparent;
@@ -236,17 +291,30 @@
     </style>
   </head>
   <body>
+    <!-- Update the sidebar section in your HTML -->
     <div class="sidebar">
       <div class="server-header">Discord Server</div>
-      <div class="channel-item">
-        <i data-lucide="hash"></i>
-        general
+      <div class="channels-header">
+        <span>Text Channels</span>
+        <button id="add-channel-btn" class="action-button">
+          <i data-lucide="plus"></i>
+        </button>
       </div>
-      <div class="channel-item">
-        <i data-lucide="hash"></i>
-        announcements
+      <div class="channels-list">
+        <!-- Channels will be dynamically added here -->
       </div>
     </div>
+
+    <!-- Update the section header -->
+    <section>
+      <h1>
+        <i data-lucide="hash"></i>
+        <span id="greeting">Welcome to </span>
+        <span class="channel-name">general</span>
+        <span id="userNameSpan"></span>
+      </h1>
+      <!-- Rest of the section content remains the same -->
+    </section>
 
     <section>
       <h1>

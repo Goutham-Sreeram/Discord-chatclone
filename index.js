@@ -7,10 +7,13 @@ import {
   collection,
   query,
   orderBy,
+  getDocs,
+  setDoc,
+  doc,
 } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-auth.js";
 
-// Firebase configuration
+// Firebase configuration (your existing config)
 const firebaseConfig = {
   apiKey: "AIzaSyAWmqkD80ezafCkyMJpLinvxq8E4OA0KsM",
   authDomain: "chat-app-d7dc2.firebaseapp.com",
@@ -26,11 +29,60 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Fetch and display messages
+let currentChannel = "general"; // Default channel
+
+// Function to create a new channel
+async function createChannel(channelName) {
+  const channelRef = doc(db, "channels", channelName);
+  await setDoc(channelRef, {
+    name: channelName,
+    createdAt: new Date(),
+  });
+
+  // Add the channel to the sidebar
+  addChannelToSidebar(channelName);
+}
+
+// Function to add channel to sidebar
+function addChannelToSidebar(channelName) {
+  const channelItem = document.createElement("div");
+  channelItem.className = "channel-item";
+  channelItem.innerHTML = `
+    <i data-lucide="hash"></i>
+    ${channelName}
+  `;
+
+  channelItem.addEventListener("click", () => switchChannel(channelName));
+  document.querySelector(".channels-list").appendChild(channelItem);
+  lucide.createIcons(); // Refresh icons
+}
+
+// Function to switch channels
+async function switchChannel(channelName) {
+  currentChannel = channelName;
+  document.querySelectorAll(".channel-item").forEach((item) => {
+    item.classList.remove("active");
+    if (item.textContent.trim() === channelName) {
+      item.classList.add("active");
+    }
+  });
+
+  // Update header and input placeholder
+  document.querySelector("h1 span.channel-name").textContent = channelName;
+  document.getElementById(
+    "message-input"
+  ).placeholder = `Message #${channelName}`;
+
+  // Clear current messages and load new channel messages
+  document.getElementById("msgs").innerHTML = "";
+  await messageGet();
+}
+
+// Modified messageGet function to handle channels
 const messageGet = async function () {
   const userName = localStorage.getItem("name");
   if (!userName) {
-    window.location.href = "./"; // Redirect if not authenticated
+    window.location.href = "./";
     return;
   }
 
@@ -49,16 +101,26 @@ const messageGet = async function () {
   const messagesElement = document.getElementById("msgs");
   let messagesHTML = "";
 
-  // Real-time Firestore updates
-  onSnapshot(query(collection(db, "message"), orderBy("time")), (snapshot) => {
+  // Real-time Firestore updates for current channel
+  const channelMessagesRef = collection(
+    db,
+    "channels",
+    currentChannel,
+    "messages"
+  );
+  const q = query(channelMessagesRef, orderBy("time"));
+
+  onSnapshot(q, (snapshot) => {
+    messagesHTML = "";
+    currentDate = null;
+
     snapshot.forEach((doc) => {
       const data = doc.data();
       const messageDate = new Date(data.time.toMillis());
 
-      const isUser = data.name === userName; // Check if the message is from the user
-      const messageClass = isUser ? "sender" : "receiver"; // Determine class
+      const isUser = data.name === userName;
+      const messageClass = isUser ? "sender" : "receiver";
 
-      // Add date separator if date changes
       if (
         !currentDate ||
         currentDate.toDateString() !== messageDate.toDateString()
@@ -76,51 +138,24 @@ const messageGet = async function () {
       const hours = messageDate.getHours();
       const minutes = String(messageDate.getMinutes()).padStart(2, "0");
       const amPm = hours >= 12 ? "PM" : "AM";
-      const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+      const formattedHours = hours % 12 || 12;
       const time = `${formattedHours}:${minutes} ${amPm}`;
       const messageDiv = `
-          <div class="message ${messageClass}">
-            <p class="name">${data.name}</p>
-            <p class="message-content">${data.message}</p>
-            <p class="time">${time}</p>
-          </div>
-        `;
+        <div class="message ${messageClass}">
+          <p class="name">${data.name}</p>
+          <p class="message-content">${data.message}</p>
+          <p class="time">${time}</p>
+        </div>
+      `;
       messagesHTML += messageDiv;
     });
 
     messagesElement.innerHTML = messagesHTML;
+    messagesElement.scrollTop = messagesElement.scrollHeight;
   });
 };
 
-// Function to add a new message
-function addMessage(text, isUser = true) {
-  const messageClass = isUser ? "sender" : "receiver";
-
-  const messageDiv = document.createElement("div");
-  messageDiv.classList.add("message", messageClass);
-
-  const messageContent = `
-    <p class="message-content">${text}</p>
-    <p class="name">${isUser ? "You" : "Other User"}</p>
-    <p class="time">${new Date().toLocaleTimeString()}</p>
-  `;
-
-  messageDiv.innerHTML = messageContent;
-  document.getElementById("msgs").appendChild(messageDiv);
-
-  // Animate new message
-  gsap.from(messageDiv, {
-    x: isUser ? 20 : -20,
-    opacity: 0,
-    duration: 0.5,
-    ease: "power2.out",
-  });
-
-  // Scroll to bottom
-  messageDiv.scrollIntoView({ behavior: "smooth" });
-}
-
-// Send message on form submission
+// Modified send message function to handle channels
 document.querySelector(".send-option").addEventListener("submit", async (e) => {
   e.preventDefault();
   const messageInput = document.getElementById("message-input");
@@ -129,15 +164,43 @@ document.querySelector(".send-option").addEventListener("submit", async (e) => {
 
   const userName = localStorage.getItem("name");
 
-  // Add message to Firestore
-  await addDoc(collection(db, "message"), {
+  // Add message to the current channel's messages collection
+  await addDoc(collection(db, "channels", currentChannel, "messages"), {
     name: userName,
     message: messageText,
     time: new Date(),
   });
 
-  messageInput.value = ""; // Clear input
+  messageInput.value = "";
 });
 
-// Initialize the message display
-messageGet();
+// Initialize channels
+async function initializeChannels() {
+  // Get existing channels
+  const channelsSnapshot = await getDocs(collection(db, "channels"));
+  const channelsList = document.querySelector(".channels-list");
+  channelsList.innerHTML = ""; // Clear existing channels
+
+  channelsSnapshot.forEach((doc) => {
+    addChannelToSidebar(doc.id);
+  });
+
+  // Set initial channel
+  if (channelsSnapshot.empty) {
+    await createChannel("general");
+  }
+  switchChannel(currentChannel);
+}
+
+// Add new channel button listener
+document.getElementById("add-channel-btn").addEventListener("click", () => {
+  const channelName = prompt("Enter new channel name:")
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "-");
+  if (channelName) {
+    createChannel(channelName);
+  }
+});
+
+// Initialize the application
+initializeChannels();
