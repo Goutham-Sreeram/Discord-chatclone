@@ -6,12 +6,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC1EO_E-51bS-Bf2pC7ok42olJxWitW1gI",
-  authDomain: "chat-4b99b.firebaseapp.com",
-  projectId: "chat-4b99b",
-  storageBucket: "chat-4b99b.appspot.com",
-  messagingSenderId: "702805514853",
-  appId: "1:702805514853:web:ee02a41d16e3978bed048c",
+  apiKey: "AIzaSyAWmqkD80ezafCkyMJpLinvxq8E4OA0KsM",
+  authDomain: "chat-app-d7dc2.firebaseapp.com",
+  projectId: "chat-app-d7dc2",
+  storageBucket: "chat-app-d7dc2.appspot.com",
+  messagingSenderId: "853514079785",
+  appId: "1:853514079785:web:37bb38659b3865de415638",
+  measurementId: "G-4WF44FQYFP",
 };
 
 const app = initializeApp(firebaseConfig);
